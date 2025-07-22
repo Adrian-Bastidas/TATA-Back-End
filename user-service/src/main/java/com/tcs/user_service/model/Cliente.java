@@ -1,15 +1,19 @@
 package com.tcs.user_service.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Cliente extends Persona {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    @GeneratedValue(generator = "cliente-id-generator")
+    @GenericGenerator(
+            name = "cliente-id-generator",
+            strategy = "com.tcs.user_service.utils.ClienteIdGenerator"
+    )
     private Long clienteId;
-
-    private String password;
+    private String contrasena;
 
     private Boolean estado;
 
@@ -21,13 +25,12 @@ public class Cliente extends Persona {
     public void setClienteId(Long clienteId) {
         this.clienteId = clienteId;
     }
-
-    public String getPassword() {
-        return password;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setContrasena(String password) {
+        this.contrasena = password;
     }
 
     public Boolean getEstado() {
