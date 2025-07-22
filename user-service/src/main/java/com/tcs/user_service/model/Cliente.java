@@ -7,11 +7,6 @@ import org.hibernate.annotations.GenericGenerator;
 public class Cliente extends Persona {
 
     @Column(unique = true, nullable = false)
-    @GeneratedValue(generator = "cliente-id-generator")
-    @GenericGenerator(
-            name = "cliente-id-generator",
-            strategy = "com.tcs.user_service.utils.ClienteIdGenerator"
-    )
     private Long clienteId;
     private String contrasena;
 
