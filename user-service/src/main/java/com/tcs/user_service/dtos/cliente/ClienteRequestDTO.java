@@ -1,26 +1,14 @@
-package com.tcs.user_service.model;
+package com.tcs.user_service.dtos.cliente;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
-
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Persona {
-    @Id
-    @GeneratedValue(generator = "persona-id-generator")
-    @GenericGenerator(
-            name = "persona-id-generator",
-            strategy = "com.tcs.user_service.utils.SafeRandomIdGenerator"
-    )
-    private Long personaId;
-    private String nombre;
-    private String genero;
-    private Integer edad;
-    private String identificacion;
-    private String direccion;
-    private String telefono;
-
-    // Getters y Setters
+public class ClienteRequestDTO {
+    public String nombre;
+    public String genero;
+    public Integer edad;
+    public String identificacion;
+    public String direccion;
+    public String telefono;
+    public String contrasena;
+    public Boolean estado;
 
     public String getNombre() {
         return nombre;
@@ -68,5 +56,21 @@ public abstract class Persona {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
     }
 }
