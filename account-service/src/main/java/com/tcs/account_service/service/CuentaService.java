@@ -3,11 +3,14 @@ package com.tcs.account_service.service;
 import com.tcs.account_service.dtos.cliente.ClienteVo;
 import com.tcs.account_service.dtos.cuenta.CuentaRequestDTO;
 import com.tcs.account_service.dtos.cuenta.CuentaResponseVo;
+import com.tcs.account_service.dtos.cuenta.EstadoCuentaReporteVO;
 import com.tcs.account_service.exception.ClienteNoEncontradoException;
 import com.tcs.account_service.exception.CuentaNoEncontradaException;
 import com.tcs.account_service.mappers.CuentaMapper;
 import com.tcs.account_service.model.Cuenta;
+import com.tcs.account_service.model.Movimiento;
 import com.tcs.account_service.repository.CuentaRepository;
+import com.tcs.account_service.repository.MovimientoRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,9 @@ import org.springframework.stereotype.Service;
 
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +38,8 @@ public class CuentaService {
 
     private final SecureRandom random = new SecureRandom();
     private static final Logger logger = LoggerFactory.getLogger(CuentaService.class);
+    @Autowired
+    private MovimientoRepository movimientoRepository;
 
 
     @Transactional
@@ -146,5 +154,61 @@ public class CuentaService {
         logger.debug("Número de cuenta único generado: {}", numeroCuenta);
         return numeroCuenta;
     }
+
+    public List<EstadoCuentaReporteVO> generarReporte(Long clienteId, Date desde, Date hasta) {
+        logger.info("Generando reporte de estado de cuenta para cliente ID: {}", clienteId);
+
+        ClienteVo cliente;
+        try {
+            cliente = userServiceClient.obtenerCliente(clienteId);
+            if (cliente == null) {
+                logger.warn("Cliente con ID {} no encontrado", clienteId);
+                throw new ClienteNoEncontradoException("Cliente con ID " + clienteId + " no encontrado");
+            }
+            logger.info("Cliente obtenido: {}", cliente.getClienteId());
+        } catch (Exception e) {
+            logger.error("Error al obtener cliente por Feign: {}", e.getMessage(), e);
+            throw new ClienteNoEncontradoException("Error al obtener cliente: " + e.getMessage());
+        }
+
+        List<Cuenta> cuentas = cuentaRepository.findByClienteId(clienteId);
+        List<EstadoCuentaReporteVO> resultado = new ArrayList<>();
+
+        for (Cuenta cuenta : cuentas) {
+            List<Movimiento> movimientos = movimientoRepository
+                    .findByCuentaIdAndFechaBetweenOrderByFechaAsc(cuenta.getCuentaId(), desde, hasta);
+
+            logger.info("Movimientos encontrados para cuenta {}: {}", cuenta.getNumeroCuenta(), movimientos.size());
+
+            if (movimientos.isEmpty()) {
+                logger.info("No hay movimientos para la cuenta {}", cuenta.getNumeroCuenta());
+                continue;
+            }
+
+
+            for (Movimiento movimiento : movimientos) {
+                double saldoAntes = movimiento.getSaldo();
+                double saldoDisponible = saldoAntes + movimiento.getValor();
+
+                EstadoCuentaReporteVO vo = new EstadoCuentaReporteVO(
+                        movimiento.getFecha(),
+                        cliente.getNombre(),
+                        cuenta.getNumeroCuenta(),
+                        cuenta.getTipoCuenta(),
+                        saldoAntes,
+                        cuenta.getEstado(),
+                        movimiento.getValor(),
+                        saldoDisponible
+                );
+
+                resultado.add(vo);
+                saldoAntes = saldoDisponible;
+            }
+        }
+
+        return resultado;
+    }
+
+
 
 }

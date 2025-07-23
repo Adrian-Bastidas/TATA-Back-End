@@ -8,7 +8,7 @@ public class CuentaResponseVo {
     private String tipoCuenta;
     private Long saldoInicial;
     private Boolean estado;
-    private ClienteVo cliente; // Información del cliente desde user-service
+    private ClienteVo cliente;
 
     // Constructores
     public void CuentaVo() {}
