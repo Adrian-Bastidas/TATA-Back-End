@@ -53,6 +53,13 @@ You can find the script in this repository
 The Postman collection for testing the available endpoints is included in this repository.
 ```
 
+## 🚀 Examples
+
+<img src='assets/counts.png' width='800'>
+<img src='assets/report.png' width='800'>
+<img src='assets/movement.png' width='800'>
+<img src='assets/client.png' width='800'>
+
 ## Author
 
 👤 **Adrian Rafael Bastidas Moya**
