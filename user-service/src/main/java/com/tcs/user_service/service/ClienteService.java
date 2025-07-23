@@ -11,6 +11,7 @@ import com.tcs.user_service.utils.ClienteIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class ClienteService {
     private final ClienteMapper clienteMapper;
     @Autowired
     private ClienteIdGenerator clienteIdGenerator;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
@@ -41,7 +44,9 @@ public class ClienteService {
 
         Cliente cliente = clienteMapper.dtoToEntity(dto);
         Long clienteId = (Long) new ClienteIdGenerator().generate(null, null);
+        String contrasenaEncriptada = passwordEncoder.encode(cliente.getContrasena());
         cliente.setClienteId(clienteId);
+        cliente.setContrasena(contrasenaEncriptada);
 
         Cliente clienteGuardado = clienteRepository.save(cliente);
         logger.info("Cliente creado exitosamente con ID: {} e identificación: {}", clienteId, dto.getIdentificacion());
@@ -74,13 +79,21 @@ public class ClienteService {
                 });
 
         logger.debug("Cliente encontrado para actualización: ID {} - Identificación: {}", id, cliente.getIdentificacion());
+
         clienteMapper.updateEntityFromDto(dto, cliente);
+
+        if (dto.getContrasena() != null && !dto.getContrasena().isBlank()) {
+            String encryptedPassword = passwordEncoder.encode(dto.getContrasena());
+            cliente.setContrasena(encryptedPassword);
+            logger.debug("Contraseña actualizada con BCrypt para cliente ID: {}", id);
+        }
 
         Cliente clienteActualizado = clienteRepository.save(cliente);
         logger.info("Cliente actualizado exitosamente con ID: {}", id);
 
         return clienteMapper.entityToVo(clienteActualizado);
     }
+
 
     public void deleteCliente(Long id) {
         logger.info("Iniciando eliminación del cliente con ID: {}", id);
