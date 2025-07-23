@@ -97,7 +97,7 @@ public class ClienteService {
     public ClienteResponseVo getCliente(Long id) {
         logger.info("Consultando cliente con ID: {}", id);
 
-        Cliente cliente = clienteRepository.findById(id)
+        Cliente cliente = clienteRepository.findByClienteId(id)
                 .orElseThrow(() -> {
                     logger.warn("Cliente no encontrado con ID: {}", id);
                     return new ResourceNotFoundException("Cliente no encontrado con ID: " + id);
