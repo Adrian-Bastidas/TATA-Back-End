@@ -204,7 +204,37 @@ public class CuentaService {
 
         return resultado;
     }
+    @Transactional
+    public CuentaResponseVo actualizarCuenta(Long cuentaId, CuentaRequestDTO cuentaDTO) {
+        logger.info("Actualizando cuenta con ID: {}", cuentaId);
 
+        Cuenta cuenta = cuentaRepository.findById(cuentaId)
+                .orElseThrow(() -> {
+                    logger.warn("Cuenta con ID {} no encontrada para actualización", cuentaId);
+                    return new CuentaNoEncontradaException("Cuenta no encontrada");
+                });
 
+        ClienteVo cliente;
+        try {
+            cliente = userServiceClient.obtenerCliente(cuentaDTO.getClienteId());
+            if (cliente == null) {
+                logger.warn("Cliente con ID {} no encontrado", cuentaDTO.getClienteId());
+                throw new ClienteNoEncontradoException("Cliente con ID " + cuentaDTO.getClienteId() + " no encontrado");
+            }
+        } catch (Exception e) {
+            logger.error("Error al verificar cliente: {}", e.getMessage(), e);
+            throw new ClienteNoEncontradoException("Error al verificar cliente: " + e.getMessage());
+        }
+
+        cuenta.setClienteId(cuentaDTO.getClienteId());
+        cuenta.setTipoCuenta(cuentaDTO.getTipoCuenta());
+
+        cuenta = cuentaRepository.save(cuenta);
+        logger.info("Cuenta actualizada correctamente con ID: {}", cuenta.getCuentaId());
+
+        CuentaResponseVo cuentaVO = cuentaMapper.entityToVO(cuenta);
+        cuentaVO.setCliente(cliente);
+        return cuentaVO;
+    }
 
 }

@@ -54,5 +54,12 @@ public class CuentaController {
         List<EstadoCuentaReporteVO> reporte = cuentaService.generarReporte(clienteId, desde, hasta);
         return ResponseEntity.ok(reporte);
     }
+    @PutMapping("/{cuentaId}")
+    public ResponseEntity<CuentaResponseVo> actualizarCuenta(
+            @PathVariable Long cuentaId,
+            @Valid @RequestBody CuentaRequestDTO cuentaDTO) {
+        CuentaResponseVo cuentaActualizada = cuentaService.actualizarCuenta(cuentaId, cuentaDTO);
+        return ResponseEntity.ok(cuentaActualizada);
+    }
 
 }

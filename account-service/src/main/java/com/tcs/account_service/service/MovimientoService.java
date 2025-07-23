@@ -132,4 +132,42 @@ public class MovimientoService {
             throw e;
         }
     }
+    @Transactional
+    public MovimeintoResponseVo actualizarMovimiento(Long id, MovimientoRequestDTO dto) {
+        logger.info("Actualizando movimiento con ID: {}", id);
+
+        Movimiento movimiento = movimientoRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.warn("Movimiento con ID {} no encontrado para actualización", id);
+                    return new MovimientoNoEncontradoException("Movimiento no encontrado");
+                });
+
+        Cuenta cuenta = cuentaRepository.findByNumeroCuenta(dto.getNumeroCuenta())
+                .orElseThrow(() -> new CuentaNoEncontradaException("Cuenta no encontrada con número: " + dto.getNumeroCuenta()));
+
+
+        Long saldoActual = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : 0L;
+        Long saldoSinMovimientoViejo = saldoActual - movimiento.getValor();
+        Long nuevoSaldo = saldoSinMovimientoViejo + dto.getValor();
+
+        if (nuevoSaldo < 0) {
+            throw new SaldoInsuficiente("Saldo insuficiente para realizar el movimiento actualizado");
+        }
+
+        // Actualizar campos del movimiento
+        movimiento.setValor(dto.getValor());
+        movimiento.setTipoMovimiento(dto.getTipo());
+        movimiento.setFecha(dto.getFecha() != null ? dto.getFecha() : movimiento.getFecha());
+        movimiento.setSaldo(nuevoSaldo);
+        movimiento.setCuentaId(cuenta.getCuentaId());
+
+        movimiento = movimientoRepository.save(movimiento);
+
+        cuenta.setSaldoInicial(nuevoSaldo);
+        cuentaRepository.save(cuenta);
+
+        logger.info("Movimiento actualizado correctamente con ID: {}", movimiento.getMovimientoId());
+
+        return MovimientoMapper.toVo(movimiento);
+    }
 }

@@ -48,4 +48,11 @@ public class MovimientoController {
         movimientoService.eliminarPorId(id);
         return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<MovimeintoResponseVo> actualizarMovimiento(
+            @PathVariable Long id,
+            @Valid @RequestBody MovimientoRequestDTO dto) {
+        MovimeintoResponseVo response = movimientoService.actualizarMovimiento(id, dto);
+        return ResponseEntity.ok(response);
+    }
 }
