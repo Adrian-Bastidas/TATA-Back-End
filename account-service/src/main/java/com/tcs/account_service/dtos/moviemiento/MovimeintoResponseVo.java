@@ -6,8 +6,8 @@ public class MovimeintoResponseVo {
     private Long numeroCuenta;
     private String tipo;
     private String saldoInicial;
-    private Long estado;
-    private Boolean Movimiento;
+    private Boolean estado;
+    private String Movimiento;
 
     public MovimeintoResponseVo() {
     }
@@ -36,19 +36,19 @@ public class MovimeintoResponseVo {
         this.saldoInicial = saldoInicial;
     }
 
-    public Long getEstado() {
+    public Boolean getEstado() {
         return estado;
     }
 
-    public void setEstado(Long estado) {
+    public void setEstado(Boolean estado) {
         this.estado = estado;
     }
 
-    public Boolean getMovimiento() {
+    public String getMovimiento() {
         return Movimiento;
     }
 
-    public void setMovimiento(Boolean movimiento) {
+    public void setMovimiento(String movimiento) {
         Movimiento = movimiento;
     }
 }

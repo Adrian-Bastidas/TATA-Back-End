@@ -18,8 +18,13 @@ public class MovimientoMapper {
         vo.setNumeroCuenta(movimiento.getCuentaId());
         vo.setTipo(movimiento.getTipoMovimiento());
         vo.setSaldoInicial(String.valueOf(movimiento.getSaldo()));
-        vo.setEstado(1L);
-        vo.setMovimiento(true);
+        vo.setEstado(true);
+
+        double valor = movimiento.getValor();
+        String descripcion = (valor >= 0 ? "Depósito de " : "Retiro de ") + Math.abs(valor);
+        vo.setMovimiento(descripcion);
+
         return vo;
     }
+
 }

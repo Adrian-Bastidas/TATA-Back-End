@@ -4,8 +4,6 @@ public class ClienteVo {
     private Long clienteId;
     private String nombre;
     public String identificacion;
-    private String email;
-    private Boolean estado;
 
     public ClienteVo() {}
 
@@ -16,10 +14,4 @@ public class ClienteVo {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public Boolean getEstado() { return estado; }
-    public void setEstado(Boolean estado) { this.estado = estado; }
 }

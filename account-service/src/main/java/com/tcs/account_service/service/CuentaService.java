@@ -59,10 +59,6 @@ public class CuentaService {
             throw new ClienteNoEncontradoException("Error al verificar cliente: " + e.getMessage());
         }
 
-        if (!cliente.getEstado()) {
-            logger.info("Cliente inactivo. Procediendo a activarlo: {}", cliente.getClienteId());
-            userServiceClient.activarCliente(cliente.getClienteId());
-        }
 
         Cuenta cuenta = cuentaMapper.dtoToEntity(cuentaDTO);
         cuenta.setNumeroCuenta(generarNumeroCuenta());
